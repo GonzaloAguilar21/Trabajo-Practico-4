@@ -1,0 +1,72 @@
+class TablaHash:
+    def __init__(self, tamaño):
+        self.tabla = [[] for _ in range(tamaño)]
+        self.tamaño = tamaño
+
+    def insertar(self, clave, valor):
+        indice = clave % self.tamaño
+        self.tabla[indice].append(valor)
+
+    def obtener(self, clave):
+        indice = clave % self.tamaño
+        return self.tabla[indice]
+
+# Funciones hash específicas
+def hash_por_tipo(tipo):
+    return hash(tipo)
+
+def hash_por_numero(numero):
+    return int(str(numero)[-1])
+
+def hash_por_nivel(nivel):
+    return nivel % 10
+
+# Inicializamos las tres tablas hash
+tabla_por_tipo = TablaHash(20)
+tabla_por_numero = TablaHash(10)
+tabla_por_nivel = TablaHash(10)
+
+# Función para cargar Pokémon en las tablas hash
+def cargar_pokemon(numero, nombre, tipos, nivel):
+    pokemon = {"numero": numero, "nombre": nombre, "tipos": tipos, "nivel": nivel}
+    for tipo in tipos:
+        tabla_por_tipo.insertar(hash_por_tipo(tipo), pokemon)
+    tabla_por_numero.insertar(hash_por_numero(numero), pokemon)
+    tabla_por_nivel.insertar(hash_por_nivel(nivel), pokemon)
+
+# Cargamos algunos Pokémons de ejemplo
+cargar_pokemon(1, "Bulbasaur", ["Planta", "Veneno"], 5)
+cargar_pokemon(4, "Charmander", ["Fuego"], 8)
+cargar_pokemon(7, "Squirtle", ["Agua"], 10)
+cargar_pokemon(25, "Pikachu", ["Eléctrico"], 15)
+cargar_pokemon(37, "Vulpix", ["Fuego"], 20)
+cargar_pokemon(50, "Diglett", ["Tierra"], 25)
+cargar_pokemon(89, "Muk", ["Veneno"], 30)
+
+# E. Mostrar todos los Pokémons cuyos números terminan en 3, 7 y 9
+def pokemons_numeros_terminan_en(*digitos):
+    resultado = []
+    for digito in digitos:
+        resultado.extend(tabla_por_numero.obtener(digito))
+    return resultado
+
+print("Pokémons cuyos números terminan en 3, 7 y 9:", pokemons_numeros_terminan_en(3, 7, 9))
+
+# F. Mostrar todos los Pokémons cuyos niveles son múltiplos de 2, 5 y 10
+def pokemons_niveles_multiplos_de(*multiplos):
+    resultado = []
+    for i in range(10):
+        if any(i % m == 0 for m in multiplos):
+            resultado.extend(tabla_por_nivel.obtener(i))
+    return resultado
+
+print("Pokémons cuyos niveles son múltiplos de 2, 5 y 10:", pokemons_niveles_multiplos_de(2, 5, 10))
+
+# G. Mostrar todos los Pokémons de los siguientes tipos: Acero, Fuego, Eléctrico, Hielo
+def pokemons_por_tipos(*tipos):
+    resultado = []
+    for tipo in tipos:
+        resultado.extend(tabla_por_tipo.obtener(hash_por_tipo(tipo)))
+    return resultado
+
+print("Pokémons de tipo Acero, Fuego, Eléctrico, Hielo:", pokemons_por_tipos("Acero", "Fuego", "Eléctrico", "Hielo"))
